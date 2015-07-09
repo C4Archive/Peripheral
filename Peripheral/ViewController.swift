@@ -14,7 +14,8 @@ class ViewController: UIViewController, CBPeripheralManagerDelegate {
 
     let connection_service_uuid = CBUUID(string: "39BB9101-9800-4C6D-B032-CAC5ABEA1B76")
     let transfer_service_uuid = CBUUID(string: "4268FA37-EADC-4C47-AFF8-15B4569BDE05")
-
+    let transfer_characteristic_uuid = CBUUID(string: "F5815D05-DDDC-4922-BD79-63C6F4538D4D")
+    let transfer_characteristic = CBMutableCharacteristic(type: CBUUID(string: "F5815D05-DDDC-4922-BD79-63C6F4538D4D"), properties: .Write | .Read | .Notify, value: nil, permissions: .Readable | .Writeable)
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -37,6 +38,7 @@ class ViewController: UIViewController, CBPeripheralManagerDelegate {
         }
 
         let service = CBMutableService(type: transfer_service_uuid, primary: true)
+        service.characteristics = [transfer_characteristic]
         peripheralManager?.addService(service)
         peripheralManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [connection_service_uuid]])
     }
