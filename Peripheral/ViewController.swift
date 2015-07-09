@@ -10,6 +10,8 @@ import UIKit
 import CoreBluetooth
 
 class ViewController: UIViewController, CBPeripheralManagerDelegate {
+    var currentCentral : CBCentral?
+
     var peripheralManager : CBPeripheralManager?
 
     let connection_service_uuid = CBUUID(string: "39BB9101-9800-4C6D-B032-CAC5ABEA1B76")
@@ -20,6 +22,8 @@ class ViewController: UIViewController, CBPeripheralManagerDelegate {
     let interaction_service_uuid = CBUUID(string: "E8AA69DA-3D6F-4747-AC46-7CC750D26DFA")
     let notify_tap_uuid = CBUUID(string: "40A9CA6F-3862-4169-A715-FB3737D27134")
     let notify_tap_characteristic = CBMutableCharacteristic(type: CBUUID(string: "40A9CA6F-3862-4169-A715-FB3737D27134"), properties: .Read | .Notify, value: nil, permissions: .Readable)
+    let receive_tap_uuid = CBUUID(string: "D06202A0-A67B-49DF-AA13-DCC7240B10D2")
+    let receive_tap_characteristic = CBMutableCharacteristic(type: CBUUID(string: "D06202A0-A67B-49DF-AA13-DCC7240B10D2"), properties: .Write , value: nil, permissions: .Writeable)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,11 +48,9 @@ class ViewController: UIViewController, CBPeripheralManagerDelegate {
             return
         }
 
-        let service = CBMutableService(type: transfer_service_uuid, primary: true)
-        service.characteristics = [transfer_characteristic]
-
         let interaction_service = CBMutableService(type: interaction_service_uuid, primary: true)
-        interaction_service.characteristics = [notify_tap_characteristic]
+        interaction_service.characteristics = [notify_tap_characteristic, receive_tap_characteristic]
+
         peripheralManager?.addService(interaction_service)
         peripheralManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [interaction_service_uuid]])
     }
@@ -58,10 +60,13 @@ class ViewController: UIViewController, CBPeripheralManagerDelegate {
     }
 
     func peripheralManager(peripheral: CBPeripheralManager!, didAddService service: CBService!, error: NSError!) {
-        println("didAddService")
+        println("didAddService w/ \(service.characteristics.count) characteristics")
     }
 
     func peripheralManager(peripheral: CBPeripheralManager!, central: CBCentral!, didSubscribeToCharacteristic characteristic: CBCharacteristic!) {
+
+        if let c = currentCentral { }
+        else { currentCentral = central }
         println("didSubscribeToCharacteristic")
     }
 
